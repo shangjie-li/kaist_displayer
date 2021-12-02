@@ -28,7 +28,7 @@ def str2bool(v):
 
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(
-        description='KAIST Displayer')
+        description='KAIST2ROSmsg')
     parser.add_argument('--images1', default=None, type=str,
                         help='An input folder to images.')
     parser.add_argument('--images2', default=None, type=str,
