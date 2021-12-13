@@ -33,8 +33,10 @@ def parse_args(argv=None):
                         help='An input folder to images.')
     parser.add_argument('--images2', default=None, type=str,
                         help='An input folder to images.')
-    parser.add_argument('--max_images', default=-1, type=int,
-                        help='The maximum number of images from the dataset to consider. Use -1 for all.')
+    parser.add_argument('--start_index', default=0, type=int,
+                        help='The start index of image.')
+    parser.add_argument('--end_index', default=-1, type=int,
+                        help='The end index of image.')
     parser.add_argument('--frame_rate', default=30, type=int,
                         help='The frame rate to play.')
     parser.add_argument('--pub_topic1', default='image1', type=str,
@@ -73,9 +75,17 @@ if __name__ == '__main__':
     images2_list = os.listdir(args.images2)
     images2_list.sort(key = lambda x: int(x.split('.')[0]))
     
-    assert len(images1_list) == len(images2_list), 'The number of files in %s is not equal to %s.' % \
-        (args.images1, args.images2)
-    dataset_size = len(images1_list) if args.max_images < 0 else min(args.max_images, len(images1_list))
+    assert len(images1_list) == len(images2_list), \
+        'The number of files in %s is not equal to %s.' % (args.images1, args.images2)
+    dataset_size = len(images1_list)
+    
+    assert dataset_size > 0, 'The dataset is empty.'
+    assert args.start_index >= 0 and args.start_index < dataset_size, \
+        'args.start_index must be between [0, %d).' % dataset_size
+    
+    if args.end_index == -1: args.end_index = dataset_size
+    assert args.end_index > 0 and args.end_index <= dataset_size, \
+        'args.end_index must be between (0, %d].' % dataset_size
     
     total_time = dataset_size / args.frame_rate
     interval = 1 / args.frame_rate
@@ -85,7 +95,7 @@ if __name__ == '__main__':
     pub2 = rospy.Publisher(args.pub_topic2, Image, queue_size=1)
     
     try:
-        for idx in range(dataset_size):
+        for idx in range(args.start_index, args.end_index):
             path1 = os.path.join(args.images1, images1_list[idx])
             path2 = os.path.join(args.images2, images2_list[idx])
             
