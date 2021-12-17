@@ -32,8 +32,10 @@ def parse_args(argv=None):
                         help='An output folder to save images.')
     parser.add_argument('--save_split', default='selected.txt', type=str,
                         help='The output file for dataset ids.')
-    parser.add_argument('--max_images', default=-1, type=int,
-                        help='The maximum number of images from the dataset to consider. Use -1 for all.')
+    parser.add_argument('--start_index', default=0, type=int,
+                        help='The start index of image.')
+    parser.add_argument('--end_index', default=-1, type=int,
+                        help='The end index of image.')
     parser.add_argument('--show_annotations', default=False, action='store_true',
                         help='Whether or not to show annotations.')
     parser.add_argument('--display', default=False, action='store_true',
@@ -42,6 +44,8 @@ def parse_args(argv=None):
                         help='The dataset split to consider. Only trainval and test are supported.')
     parser.add_argument('--name_length', default=6, type=int,
                         help='The length of name.')
+    parser.add_argument('--start_id_for_saving', default=0, type=int,
+                        help='The id of saving image to start.')
 
     global args
     args = parser.parse_args(argv)
@@ -120,10 +124,21 @@ if __name__ == '__main__':
         with open(args.save_split, 'w') as f:
             f.seek(0)
             f.truncate()
+
+    dataset_size = len(dataset_ids)
     
-    dataset_size = len(dataset_ids) if args.max_images < 0 else min(args.max_images, len(dataset_ids))
-    for idx in range(dataset_size):
-        print('\n--------[%d/%d]--------' % (idx + 1, dataset_size))
+    assert dataset_size > 0, 'The dataset is empty.'
+    assert args.start_index >= 0 and args.start_index < dataset_size, \
+        'args.start_index must be between [0, %d).' % dataset_size
+    
+    if args.end_index == -1: args.end_index = dataset_size
+    assert args.end_index > 0 and args.end_index <= dataset_size, \
+        'args.end_index must be between (0, %d].' % dataset_size
+    
+    total = args.end_index - args.start_index
+    current_id = 0
+    for idx in range(args.start_index, args.end_index):
+        print('\n--------[%d/%d]--------' % (current_id + 1, total))
         img_id = dataset_ids[idx]
         img_path_c = os.path.join(data_root, 'images', img_id[0], 'visible', img_id[1] + '.jpg')
         img_path_t = os.path.join(data_root, 'images', img_id[0], 'lwir', img_id[1] + '.jpg')
@@ -132,12 +147,16 @@ if __name__ == '__main__':
         print('img_t: %s' % img_path_t)
         
         if save_mode:
-            save_path_c = os.path.join(args.save_folder1, str(idx).zfill(args.name_length) + '.jpg')
-            save_path_t = os.path.join(args.save_folder2, str(idx).zfill(args.name_length) + '.jpg')
+            save_path_c = os.path.join(args.save_folder1, \
+                str(current_id + args.start_id_for_saving).zfill(args.name_length) + '.jpg')
+            save_path_t = os.path.join(args.save_folder2, \
+                str(current_id + args.start_id_for_saving).zfill(args.name_length) + '.jpg')
         
         if save_mode and args.save_split is not None:
             with open(args.save_split, 'a') as f:
                 f.write(img_id[0] + '/' + img_id[1] + '\n')
+        
+        current_id += 1
         
         img_c = cv2.imread(img_path_c)
         img_t = cv2.imread(img_path_t)
@@ -186,4 +205,6 @@ if __name__ == '__main__':
                 break
             else:
                 continue
+        
+        
 

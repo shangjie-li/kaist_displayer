@@ -25,7 +25,7 @@ def parse_args(argv=None):
                         help='An output folder to save images.')
     parser.add_argument('--name_length', default=6, type=int,
                         help='The length of name of saving image.')
-    parser.add_argument('--start_id', default=0, type=int,
+    parser.add_argument('--start_id_for_saving', default=0, type=int,
                         help='The id of saving image to start.')
 
     global args
@@ -66,8 +66,8 @@ if __name__ == '__main__':
         img1 = cv2.imread(path1)
         img2 = cv2.imread(path2)
         
-        save_path1 = os.path.join(args.output_folder1, str(save_idx + args.start_id).zfill(args.name_length) + '.jpg')
-        save_path2 = os.path.join(args.output_folder2, str(save_idx + args.start_id).zfill(args.name_length) + '.jpg')
+        save_path1 = os.path.join(args.output_folder1, str(save_idx + args.start_id_for_saving).zfill(args.name_length) + '.jpg')
+        save_path2 = os.path.join(args.output_folder2, str(save_idx + args.start_id_for_saving).zfill(args.name_length) + '.jpg')
         
         cv2.imshow('image1', img1)
         cv2.imshow('image2', img2)
