@@ -37,7 +37,7 @@ def parse_args(argv=None):
                         help='The start index of image.')
     parser.add_argument('--end_index', default=-1, type=int,
                         help='The end index of image.')
-    parser.add_argument('--frame_rate', default=30, type=int,
+    parser.add_argument('--frame_rate', default=10, type=int,
                         help='The frame rate to play.')
     parser.add_argument('--pub_topic1', default='image1', type=str,
                         help='The name of ROS topic.')
@@ -62,6 +62,16 @@ def publish_image(pub, data, frame_id='base_link'):
     
     pub.publish(msg)
 
+def str2int(x):
+    try:
+        return int(x)
+    except:
+        y = ''
+        for i in x:
+            if i in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                y += i
+        return int(y)
+
 if __name__ == '__main__':
     parse_args()
     
@@ -70,10 +80,10 @@ if __name__ == '__main__':
         exit()
     
     images1_list = os.listdir(args.images1)
-    images1_list.sort(key = lambda x: int(x.split('.')[0]))
+    images1_list.sort(key = lambda x: str2int(x.split('.')[0]))
     
     images2_list = os.listdir(args.images2)
-    images2_list.sort(key = lambda x: int(x.split('.')[0]))
+    images2_list.sort(key = lambda x: str2int(x.split('.')[0]))
     
     assert len(images1_list) == len(images2_list), \
         'The number of files in %s is not equal to %s.' % (args.images1, args.images2)
