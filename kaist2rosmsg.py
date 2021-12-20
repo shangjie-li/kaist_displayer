@@ -39,9 +39,9 @@ def parse_args(argv=None):
                         help='The end index of image.')
     parser.add_argument('--frame_rate', default=10, type=int,
                         help='The frame rate to play.')
-    parser.add_argument('--pub_topic1', default='image1', type=str,
+    parser.add_argument('--pub_topic1', default='pub_rgb', type=str,
                         help='The name of ROS topic.')
-    parser.add_argument('--pub_topic2', default='image2', type=str,
+    parser.add_argument('--pub_topic2', default='pub_t', type=str,
                         help='The name of ROS topic.')
 
     global args
