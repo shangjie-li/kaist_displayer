@@ -25,8 +25,10 @@ def parse_args(argv=None):
                         help='An output folder to save images.')
     parser.add_argument('--name_length', default=6, type=int,
                         help='The length of name of saving image.')
-    parser.add_argument('--start_id_for_saving', default=0, type=int,
-                        help='The id of saving image to start.')
+    parser.add_argument('--start_id_for_saving', default=-1, type=int,
+                        help='The id of saving image to start. Use -1 for automatic check.')
+    parser.add_argument('--save_all', default=False, action='store_true',
+                        help='Whether to save all the images.')
 
     global args
     args = parser.parse_args(argv)
@@ -47,14 +49,45 @@ if __name__ == '__main__':
         os.mkdir(args.output_folder2)
     
     images1_list = os.listdir(args.input_folder1)
-    images1_list.sort(key = lambda x: int(x.split('.')[0].split('_')[1]))
+    try:
+        images1_list.sort(key = lambda x: int(x.split('.')[0].split('_')[1]))
+    except:
+        images1_list.sort(key = lambda x: int(x.split('.')[0]))
     
     images2_list = os.listdir(args.input_folder2)
-    images2_list.sort(key = lambda x: int(x.split('.')[0].split('_')[1]))
+    try:
+        images2_list.sort(key = lambda x: int(x.split('.')[0].split('_')[1]))
+    except:
+        images2_list.sort(key = lambda x: int(x.split('.')[0]))
     
     assert len(images1_list) == len(images2_list), 'The number of files in %s is not equal to %s.' % \
         (args.input_folder1, args.input_folder2)
     dataset_size = len(images1_list)
+    
+    if args.start_id_for_saving == -1:
+        files_out1 = glob.glob(os.path.join(args.output_folder1, '*'))
+        files_out2 = glob.glob(os.path.join(args.output_folder2, '*'))
+        assert len(files_out1) == len(files_out2), 'The number of files in %s is not equal to %s.' % \
+            (args.output_folder1, args.output_folder2)
+        args.start_id_for_saving = len(files_out1)
+    
+    if args.save_all:
+        for idx in range(dataset_size):
+            print('Processing: %d / %d...' % (idx + 1, dataset_size))
+            path1 = os.path.join(args.input_folder1, images1_list[idx])
+            path2 = os.path.join(args.input_folder2, images2_list[idx])
+            
+            img1 = cv2.imread(path1)
+            img2 = cv2.imread(path2)
+            
+            save_path1 = os.path.join(args.output_folder1, str(idx + args.start_id_for_saving).zfill(args.name_length) + '.jpg')
+            save_path2 = os.path.join(args.output_folder2, str(idx + args.start_id_for_saving).zfill(args.name_length) + '.jpg')
+            
+            cv2.imwrite(save_path1, img1)
+            cv2.imwrite(save_path2, img2)
+            print('Saving image to %s.' % save_path1)
+            print('Saving image to %s.' % save_path2)
+        exit()
     
     idx = 0
     save_idx = 0
@@ -79,6 +112,9 @@ if __name__ == '__main__':
         elif key == 13: # Enter
             cv2.imwrite(save_path1, img1)
             cv2.imwrite(save_path2, img2)
+            print('Saving image to %s.' % save_path1)
+            print('Saving image to %s.' % save_path2)
+            
             idx += 1
             save_idx += 1
             continue
