@@ -49,16 +49,18 @@ if __name__ == '__main__':
         os.mkdir(args.output_folder2)
     
     images1_list = os.listdir(args.input_folder1)
-    try:
-        images1_list.sort(key = lambda x: int(x.split('.')[0].split('_')[1]))
-    except:
-        images1_list.sort(key = lambda x: int(x.split('.')[0]))
+    images1_list.sort()
+    #~ try:
+        #~ images1_list.sort(key = lambda x: int(x.split('.')[0].split('_')[1]))
+    #~ except:
+        #~ images1_list.sort(key = lambda x: int(x.split('.')[0]))
     
     images2_list = os.listdir(args.input_folder2)
-    try:
-        images2_list.sort(key = lambda x: int(x.split('.')[0].split('_')[1]))
-    except:
-        images2_list.sort(key = lambda x: int(x.split('.')[0]))
+    images2_list.sort()
+    #~ try:
+        #~ images2_list.sort(key = lambda x: int(x.split('.')[0].split('_')[1]))
+    #~ except:
+        #~ images2_list.sort(key = lambda x: int(x.split('.')[0]))
     
     assert len(images1_list) == len(images2_list), 'The number of files in %s is not equal to %s.' % \
         (args.input_folder1, args.input_folder2)
